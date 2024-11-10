@@ -11,26 +11,18 @@
     <h1 class="text-4xl font-bold mb-8 text-center">Crypto Portfolio Tracker</h1>
 
     <div class="max-w-4xl mx-auto">
-        <!-- API Key Configuration -->
-        <div class="mb-8 bg-gray-800 rounded-lg p-6">
-            <h2 class="text-xl font-bold mb-4">API Configuration</h2>
-            <div class="flex gap-4">
-                <input
-                    type="text"
-                    id="apiKeyInput"
-                    placeholder="Enter your CoinMarketCap API key"
-                    class="flex-1 bg-gray-700 text-white p-2 rounded-md"
-                >
-                <button
-                    onclick="saveApiKey()"
-                    class="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-700"
-                >
-                    Save API Key
-                </button>
-            </div>
-            <p class="mt-2 text-sm text-gray-400">
-                Current Status: <span id="apiStatus">Not configured</span>
-            </p>
+        <!-- Settings Button -->
+        <div class="flex justify-end mb-8">
+            <button
+                onclick="openSettings()"
+                class="bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-600 flex items-center gap-2"
+            >
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+                </svg>
+                Settings
+            </button>
         </div>
 
         <div class="mb-8 relative">
@@ -69,6 +61,38 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Settings</h2>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-2">API Configuration</h3>
+                <input
+                    type="text"
+                    id="apiKeyInput"
+                    placeholder="Enter your CoinMarketCap API key"
+                    class="w-full bg-gray-700 text-white p-2 rounded-md mb-2"
+                >
+                <button
+                    onclick="saveApiKey()"
+                    class="w-full bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-700"
+                >
+                    Save API Key
+                </button>
+                <p class="mt-2 text-sm text-gray-400">
+                    Current Status: <span id="apiStatus">Not configured</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
     <script>
         let apiKey = localStorage.getItem('cmcApiKey') || '';
         let cryptoData = [];
@@ -79,6 +103,14 @@
         let lineChart = null;
 
         // API Key Management
+        function openSettings() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
         function saveApiKey() {
             const newApiKey = document.getElementById('apiKeyInput').value.trim();
             if (newApiKey) {
@@ -86,6 +118,7 @@
                 localStorage.setItem('cmcApiKey', apiKey);
                 document.getElementById('apiStatus').textContent = 'Configured';
                 document.getElementById('apiKeyInput').value = '';
+                closeSettings();
                 fetchCryptoData();
             }
         }
