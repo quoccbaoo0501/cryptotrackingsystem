@@ -100,9 +100,9 @@
             try {
                 // Using a proxy server to avoid CORS issues and protect API key
                 // In production, you should set up your own backend server
-                const response = await fetch('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest', {
+                const response = await fetch('http://localhost:3000/api/crypto', {
                     headers: {
-                        'X-CMC_PRO_API_KEY': apiKey
+                        'X-CMC-API-KEY': apiKey
                     }
                 });
 
