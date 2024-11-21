@@ -334,6 +334,9 @@
                         chart.options.scales.x.ticks.color = textColor;
                         chart.options.scales.y.grid.color = gridColor;
                         chart.options.scales.x.grid.color = gridColor;
+                        // Update border colors
+                        chart.options.scales.y.border = { color: textColor };
+                        chart.options.scales.x.border = { color: textColor };
                     }
                     chart.update();
                 }
@@ -471,18 +474,18 @@
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                color: 'white'
+                                color: isDarkTheme ? 'white' : 'black'
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                                color: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
                             }
                         },
                         x: {
                             ticks: {
-                                color: 'white'
+                                color: isDarkTheme ? 'white' : 'black'
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                                color: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
                             }
                         }
                     },
