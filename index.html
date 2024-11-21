@@ -40,8 +40,22 @@
             0%, 100% { opacity: 1; }
             50% { opacity: .5; }
         }
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
         .header-gradient {
-            background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 100%);
+            background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 50%, #0D1B2A 100%);
+            background-size: 200% 200%;
+            animation: gradientAnimation 10s ease infinite;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
         }
         .search-container {
