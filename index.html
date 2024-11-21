@@ -467,12 +467,14 @@
                         data: [],
                         borderColor: isDarkTheme ? '#20C997' : '#4A90E2',
                         backgroundColor: isDarkTheme ? 'rgba(32, 201, 151, 0.1)' : 'rgba(74, 144, 226, 0.1)',
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
                         pointBackgroundColor: isDarkTheme ? '#20C997' : '#4A90E2',
                         pointBorderColor: isDarkTheme ? '#20C997' : '#4A90E2',
-                        tension: 0.3,
+                        pointBorderWidth: 2,
+                        pointHoverBorderWidth: 3,
+                        tension: 0.4,
                         fill: true
                     }]
                 },
@@ -481,15 +483,19 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: false,
+                            beginAtZero: true,
+                            min: 0,
                             ticks: {
                                 color: isDarkTheme ? 'white' : 'black',
-                                padding: 10
+                                padding: 10,
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
                             },
                             grid: {
-                                color: isDarkTheme ? '#3A3F51' : 'rgba(0, 0, 0, 0.1)',
+                                color: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                                 drawBorder: true,
-                                borderColor: isDarkTheme ? '#3A3F51' : 'rgba(0, 0, 0, 0.1)',
+                                borderColor: isDarkTheme ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
                                 lineWidth: 1
                             }
                         },
@@ -498,12 +504,14 @@
                                 color: isDarkTheme ? 'white' : 'black',
                                 maxRotation: 45,
                                 minRotation: 45,
-                                padding: 10
+                                padding: 10,
+                                autoSkip: true,
+                                maxTicksLimit: 8
                             },
                             grid: {
-                                color: isDarkTheme ? '#3A3F51' : 'rgba(0, 0, 0, 0.1)',
+                                color: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                                 drawBorder: true,
-                                borderColor: isDarkTheme ? '#3A3F51' : 'rgba(0, 0, 0, 0.1)',
+                                borderColor: isDarkTheme ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
                                 lineWidth: 1
                             }
                         }
@@ -514,20 +522,34 @@
                             align: 'end',
                             labels: {
                                 color: isDarkTheme ? 'white' : 'black',
-                                boxWidth: 12,
-                                padding: 15
+                                boxWidth: 16,
+                                padding: 20,
+                                font: {
+                                    size: 13,
+                                    weight: 'bold'
+                                }
                             }
                         },
                         tooltip: {
-                            backgroundColor: isDarkTheme ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                            backgroundColor: isDarkTheme ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                             titleColor: isDarkTheme ? '#fff' : '#000',
                             bodyColor: isDarkTheme ? '#fff' : '#000',
-                            padding: 10,
-                            cornerRadius: 6,
+                            padding: 12,
+                            cornerRadius: 8,
                             displayColors: false,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
                             callbacks: {
                                 label: function(context) {
-                                    return `Value: $${context.parsed.y.toFixed(2)}`;
+                                    return `Value: $${context.parsed.y.toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })}`;
                                 },
                                 title: function(context) {
                                     return `Time: ${context[0].label}`;
