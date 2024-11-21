@@ -9,18 +9,35 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <style>
         .theme-transition {
-            transition: all 0.5s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out forwards;
         }
         .portfolio-card {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: linear-gradient(145deg, #2C3E50, rgba(44, 62, 80, 0.9));
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -4px rgba(0, 0, 0, 0.06);
             border: 2px solid transparent;
+            backdrop-filter: blur(8px);
         }
         .portfolio-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(32, 201, 151, 0.1), 0 4px 6px -2px rgba(32, 201, 151, 0.05);
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 20px 25px -5px rgba(32, 201, 151, 0.1), 0 10px 10px -5px rgba(32, 201, 151, 0.04);
             border-color: #20C997;
+            background: linear-gradient(145deg, #34495E, rgba(52, 73, 94, 0.9));
         }
         .portfolio-card.active {
             border-color: #FFC107;
@@ -56,7 +73,9 @@
             background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 50%, #0D1B2A 100%);
             background-size: 200% 200%;
             animation: gradientAnimation 10s ease infinite;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
         }
         .search-container {
             position: relative;
@@ -72,7 +91,8 @@
         }
         .btn-gradient {
             background: linear-gradient(145deg, #0066FF, #0056D1);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 102, 255, 0.2);
         }
         .btn-gradient:hover {
             background: linear-gradient(145deg, #0056D1, #0046A1);
@@ -525,7 +545,7 @@
 
         function updatePortfolioUI() {
             portfolioList.innerHTML = portfolio.map(asset => `
-                <div class="flex flex-col mb-6 p-4 bg-gray-700 rounded-lg">
+                <div class="flex flex-col mb-6 p-4 bg-gray-700 rounded-lg slide-in">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-lg font-semibold">${asset.name} (${asset.symbol})</span>
                         <button onclick="removeFromPortfolio('${asset.id}')"
