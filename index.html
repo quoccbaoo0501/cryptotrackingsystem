@@ -6,13 +6,52 @@
     <title>Crypto Portfolio Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        .theme-transition {
+            transition: all 0.3s ease;
+        }
+        .portfolio-card {
+            transition: transform 0.2s ease;
+        }
+        .portfolio-card:hover {
+            transform: translateY(-2px);
+        }
+        #notification {
+            transition: opacity 0.3s ease;
+            transform: translateY(-100%);
+        }
+        #notification.show {
+            transform: translateY(0);
+        }
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-gray-900 text-white p-8">
+<body class="min-h-screen bg-gray-900 text-white p-8 theme-transition" id="app-body">
+    <!-- Notification -->
+    <div id="notification" class="fixed top-0 left-0 right-0 bg-green-500 text-white p-4 text-center opacity-0 z-50">
+        <span id="notification-text"></span>
+    </div>
     <h1 class="text-4xl font-bold mb-8 text-center">Crypto Portfolio Tracker</h1>
 
     <div class="max-w-4xl mx-auto">
-        <!-- Settings Button -->
-        <div class="flex justify-end mb-8">
+        <!-- Header Controls -->
+        <div class="flex justify-between items-center mb-8">
+            <button
+                onclick="toggleTheme()"
+                class="bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-600 flex items-center gap-2"
+            >
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+                <span id="theme-text">Light Mode</span>
+            </button>
             <button
                 onclick="openSettings()"
                 class="bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-600 flex items-center gap-2"
@@ -101,6 +140,53 @@
         let chartData = [];
         let pieChart = null;
         let lineChart = null;
+        let isDarkTheme = true;
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.className = `fixed top-0 left-0 right-0 p-4 text-white text-center z-50 show ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            document.getElementById('notification-text').textContent = message;
+            notification.style.opacity = '1';
+            setTimeout(() => {
+                notification.style.opacity = '0';
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            const body = document.getElementById('app-body');
+            const themeText = document.getElementById('theme-text');
+            
+            if (isDarkTheme) {
+                body.className = 'min-h-screen bg-gray-900 text-white p-8 theme-transition';
+                themeText.textContent = 'Light Mode';
+            } else {
+                body.className = 'min-h-screen bg-gray-100 text-gray-900 p-8 theme-transition';
+                themeText.textContent = 'Dark Mode';
+            }
+            
+            updateChartsTheme();
+        }
+
+        function updateChartsTheme() {
+            const textColor = isDarkTheme ? 'white' : 'black';
+            const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            
+            [pieChart, lineChart].forEach(chart => {
+                if (chart) {
+                    chart.options.plugins.legend.labels.color = textColor;
+                    if (chart.options.scales) {
+                        chart.options.scales.y.ticks.color = textColor;
+                        chart.options.scales.x.ticks.color = textColor;
+                        chart.options.scales.y.grid.color = gridColor;
+                        chart.options.scales.x.grid.color = gridColor;
+                    }
+                    chart.update();
+                }
+            });
+        }
 
         // API Key Management
         function openSettings() {
