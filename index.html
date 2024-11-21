@@ -9,16 +9,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <style>
         .theme-transition {
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
         }
         .portfolio-card {
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, rgba(55, 65, 81, 0.9), rgba(31, 41, 55, 0.9));
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         .portfolio-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         #notification {
-            transition: opacity 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             transform: translateY(-100%);
         }
         #notification.show {
@@ -31,6 +34,31 @@
             0%, 100% { opacity: 1; }
             50% { opacity: .5; }
         }
+        .header-gradient {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .search-container {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .search-container:focus-within {
+            transform: scale(1.01);
+        }
+        .btn-gradient {
+            background: linear-gradient(145deg, #3b82f6, #2563eb);
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .theme-toggle {
+            transition: all 0.5s ease;
+        }
+        .theme-toggle:hover {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-900 text-white p-8 theme-transition" id="app-body">
@@ -38,7 +66,32 @@
     <div id="notification" class="fixed top-0 left-0 right-0 bg-green-500 text-white p-4 text-center opacity-0 z-50">
         <span id="notification-text"></span>
     </div>
-    <h1 class="text-4xl font-bold mb-8 text-center">Crypto Portfolio Tracker</h1>
+    <!-- Header Section -->
+    <div class="header-gradient rounded-lg p-6 mb-8 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h1 class="text-4xl font-bold">Crypto Portfolio Tracker</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="relative">
+                <button onclick="toggleUserMenu()" class="flex items-center space-x-2 bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span>Account</span>
+                </button>
+                <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5">
+                    <div class="py-1">
+                        <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-600">Profile</a>
+                        <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-600">Settings</a>
+                        <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-600">Sign out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="max-w-4xl mx-auto">
         <!-- Header Controls -->
@@ -64,15 +117,43 @@
             </button>
         </div>
 
-        <div class="mb-8 relative">
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="Search and add cryptocurrencies..."
-                class="w-full bg-gray-800 text-white pr-10 p-2 rounded-md"
-            >
-            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <div id="searchResults" class="hidden absolute z-10 w-full mt-2 bg-gray-800 rounded-md shadow-lg max-h-60 overflow-y-auto"></div>
+        <div class="search-container mb-8">
+            <div class="relative">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search and add cryptocurrencies..."
+                    class="w-full bg-gray-800 text-white pr-24 p-4 rounded-lg shadow-lg border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                <div class="absolute right-0 top-0 h-full flex items-center pr-3">
+                    <button class="p-2 hover:bg-gray-700 rounded-full mr-2" onclick="toggleFilters()">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                    </button>
+                    <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+            </div>
+            <div id="searchResults" class="hidden absolute z-10 w-full mt-2 bg-gray-800 rounded-lg shadow-xl max-h-60 overflow-y-auto border border-gray-700"></div>
+            <div id="filterMenu" class="hidden absolute z-10 w-full mt-2 bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Sort By</label>
+                        <select class="w-full bg-gray-700 rounded-md p-2">
+                            <option>Market Cap</option>
+                            <option>Price</option>
+                            <option>24h Change</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Price Range</label>
+                        <div class="flex space-x-2">
+                            <input type="number" placeholder="Min" class="w-1/2 bg-gray-700 rounded-md p-2">
+                            <input type="number" placeholder="Max" class="w-1/2 bg-gray-700 rounded-md p-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -502,7 +583,35 @@
             if (apiKey) {
                 fetchCryptoData();
             }
+            // Initialize user menu closed
+            document.getElementById('userMenu').classList.add('hidden');
         }
+
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function toggleFilters() {
+            const filterMenu = document.getElementById('filterMenu');
+            filterMenu.classList.toggle('hidden');
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            const filterMenu = document.getElementById('filterMenu');
+            const userButton = event.target.closest('button');
+            const filterButton = event.target.closest('button[onclick="toggleFilters()"]');
+
+            if (!userButton && !userMenu.classList.contains('hidden')) {
+                userMenu.classList.add('hidden');
+            }
+
+            if (!filterButton && !filterMenu.classList.contains('hidden')) {
+                filterMenu.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
