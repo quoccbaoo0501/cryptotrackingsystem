@@ -219,7 +219,7 @@
         </div>
 
         <div class="mt-8 bg-gray-800 rounded-lg p-6">
-            <h2 class="text-xl font-bold mb-4">Portfolio Value Over Time</h2>
+            <h2 class="text-xl font-bold mb-4" id="portfolioValueTitle">Portfolio Value Over Time</h2>
             <div class="h-[300px]">
                 <canvas id="lineChart"></canvas>
             </div>
@@ -288,6 +288,7 @@
             if (isDarkTheme) {
                 body.className = 'min-h-screen bg-gray-900 text-white p-8 theme-transition';
                 themeText.textContent = 'Light Mode';
+                document.getElementById('portfolioValueTitle').style.color = '#ffffff'; // White for dark mode
                 document.querySelectorAll('[class*="bg-"]').forEach(el => {
                     if (el.classList.contains('bg-white')) {
                         el.classList.remove('bg-white', 'shadow-lg', 'shadow-md', 'border', 'border-gray-200');
@@ -307,6 +308,7 @@
             } else {
                 body.className = 'min-h-screen bg-gray-50 text-gray-900 p-8 theme-transition light-mode';
                 themeText.textContent = 'Dark Mode';
+                document.getElementById('portfolioValueTitle').style.color = '#1a202c'; // Dark gray for light mode
                 document.querySelectorAll('[class*="bg-gray-"]').forEach(el => {
                     if (el.classList.contains('bg-gray-800')) {
                         el.classList.remove('bg-gray-800');
