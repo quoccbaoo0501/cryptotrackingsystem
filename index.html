@@ -167,7 +167,7 @@
         <div class="flex justify-between items-center mb-8">
             <button
                 onclick="toggleTheme()"
-                class="bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-600 flex items-center gap-2"
+                class="bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-600 flex items-center gap-2 border border-transparent"
             >
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -176,7 +176,7 @@
             </button>
             <button
                 onclick="openSettings()"
-                class="bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-600 flex items-center gap-2"
+                class="bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-600 flex items-center gap-2 border border-transparent"
             >
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
@@ -288,9 +288,21 @@
             if (isDarkTheme) {
                 body.className = 'min-h-screen bg-gray-900 text-white p-8 theme-transition';
                 themeText.textContent = 'Light Mode';
-                document.querySelectorAll('[class*="bg-gray-"]').forEach(el => {
-                    if (el.classList.contains('bg-gray-800')) el.classList.replace('bg-gray-800', 'bg-gray-800');
-                    if (el.classList.contains('bg-gray-700')) el.classList.replace('bg-gray-700', 'bg-gray-700');
+                document.querySelectorAll('[class*="bg-"]').forEach(el => {
+                    if (el.classList.contains('bg-white')) {
+                        el.classList.remove('bg-white', 'shadow-lg', 'shadow-md', 'border', 'border-gray-200');
+                        el.classList.add('bg-gray-800');
+                    }
+                    if (el.classList.contains('bg-gray-700')) {
+                        el.classList.add('bg-gray-700');
+                    }
+                });
+                // Reset button styles for dark mode
+                document.querySelectorAll('button').forEach(btn => {
+                    if (!btn.classList.contains('bg-red-600')) {
+                        btn.classList.remove('bg-white', 'border-gray-200');
+                        btn.classList.add('bg-gray-700');
+                    }
                 });
             } else {
                 body.className = 'min-h-screen bg-gray-50 text-gray-900 p-8 theme-transition light-mode';
