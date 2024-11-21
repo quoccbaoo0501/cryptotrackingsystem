@@ -13,14 +13,14 @@
         }
         .portfolio-card {
             transition: all 0.3s ease;
-            background: linear-gradient(145deg, rgba(55, 65, 81, 0.9), rgba(31, 41, 55, 0.9));
+            background: linear-gradient(145deg, #2C3E50, rgba(44, 62, 80, 0.9));
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             border: 2px solid transparent;
         }
         .portfolio-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            border-color: #00FF99;
+            box-shadow: 0 10px 15px -3px rgba(32, 201, 151, 0.1), 0 4px 6px -2px rgba(32, 201, 151, 0.05);
+            border-color: #20C997;
         }
         .portfolio-card.active {
             border-color: #FFC107;
@@ -41,8 +41,8 @@
             50% { opacity: .5; }
         }
         .header-gradient {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 100%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
         }
         .search-container {
             position: relative;
@@ -52,8 +52,8 @@
             transform: scale(1.01);
         }
         .search-container input:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+            border-color: #00A3FF;
+            box-shadow: 0 0 0 3px rgba(0, 163, 255, 0.3);
             outline: none;
         }
         .btn-gradient {
@@ -154,34 +154,10 @@
                     class="w-full bg-gray-800 text-white pr-24 p-4 rounded-lg shadow-lg border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                 <div class="absolute right-0 top-0 h-full flex items-center pr-3">
-                    <button class="p-2 hover:bg-gray-700 rounded-full mr-2" onclick="toggleFilters()">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                        </svg>
-                    </button>
                     <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 </div>
             </div>
             <div id="searchResults" class="hidden absolute z-10 w-full mt-2 bg-gray-800 rounded-lg shadow-xl max-h-60 overflow-y-auto border border-gray-700"></div>
-            <div id="filterMenu" class="hidden absolute z-10 w-full mt-2 bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Sort By</label>
-                        <select class="w-full bg-gray-700 rounded-md p-2">
-                            <option>Market Cap</option>
-                            <option>Price</option>
-                            <option>24h Change</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Price Range</label>
-                        <div class="flex space-x-2">
-                            <input type="number" placeholder="Min" class="w-1/2 bg-gray-700 rounded-md p-2">
-                            <input type="number" placeholder="Max" class="w-1/2 bg-gray-700 rounded-md p-2">
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -272,7 +248,7 @@
                 body.className = 'min-h-screen bg-gray-900 text-white p-8 theme-transition';
                 themeText.textContent = 'Light Mode';
             } else {
-                body.className = 'min-h-screen bg-gray-100 text-gray-900 p-8 theme-transition';
+                body.className = 'min-h-screen bg-[#E8F0FE] text-gray-900 p-8 theme-transition';
                 themeText.textContent = 'Dark Mode';
             }
             
@@ -620,24 +596,14 @@
             menu.classList.toggle('hidden');
         }
 
-        function toggleFilters() {
-            const filterMenu = document.getElementById('filterMenu');
-            filterMenu.classList.toggle('hidden');
-        }
 
         // Close menus when clicking outside
         document.addEventListener('click', function(event) {
             const userMenu = document.getElementById('userMenu');
-            const filterMenu = document.getElementById('filterMenu');
             const userButton = event.target.closest('button');
-            const filterButton = event.target.closest('button[onclick="toggleFilters()"]');
 
             if (!userButton && !userMenu.classList.contains('hidden')) {
                 userMenu.classList.add('hidden');
-            }
-
-            if (!filterButton && !filterMenu.classList.contains('hidden')) {
-                filterMenu.classList.add('hidden');
             }
         });
     </script>
