@@ -463,7 +463,7 @@
                     datasets: [{
                         label: 'Portfolio Value ($)',
                         data: [],
-                        borderColor: '#8884d8',
+                        borderColor: isDarkTheme ? '#8884d8' : '#4834d8',
                         tension: 0.1
                     }]
                 },
@@ -492,7 +492,7 @@
                     plugins: {
                         legend: {
                             labels: {
-                                color: 'white'
+                                color: isDarkTheme ? 'white' : 'black'
                             }
                         }
                     }
