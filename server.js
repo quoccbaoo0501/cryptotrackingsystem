@@ -15,6 +15,12 @@ app.get('/api/crypto', async (req, res) => {
         const response = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest', {
             headers: {
                 'X-CMC_PRO_API_KEY': apiKey
+            },
+            params: {
+                limit: 500,  // Get more coins
+                convert: 'USD',
+                sort: 'market_cap',
+                sort_dir: 'desc'
             }
         });
 

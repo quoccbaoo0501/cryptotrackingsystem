@@ -148,8 +148,10 @@
                     id: coin.id.toString(),
                     name: coin.name,
                     symbol: coin.symbol,
-                    price: coin.quote.USD.price
-                }));
+                    price: coin.quote.USD.price,
+                    market_cap: coin.quote.USD.market_cap,
+                    rank: coin.cmc_rank
+                })).sort((a, b) => a.rank - b.rank);
 
                 document.getElementById('apiStatus').textContent = 'Connected';
                 updateSearchResults('');
@@ -271,10 +273,13 @@
                 return;
             }
 
-            const filteredCryptos = cryptoData.filter(crypto =>
-                crypto.name.toLowerCase().includes(search) ||
-                crypto.symbol.toLowerCase().includes(search)
-            );
+            const filteredCryptos = cryptoData.filter(crypto => {
+                const searchTerms = search.split(' ');
+                return searchTerms.every(term =>
+                    crypto.name.toLowerCase().includes(term) ||
+                    crypto.symbol.toLowerCase().includes(term)
+                );
+            });
 
             searchResults.innerHTML = filteredCryptos.slice(0, 10).map(crypto => `
                 <div class="flex justify-between items-center p-2 hover:bg-gray-700 cursor-pointer"
