@@ -171,6 +171,14 @@
     </div>
 
     <div class="max-w-4xl mx-auto">
+        <!-- Portfolio Selection Bar -->
+        <div class="flex items-center gap-4 mb-8 overflow-x-auto p-2 bg-gray-800 rounded-lg">
+            <span class="text-gray-400 whitespace-nowrap">Select Portfolio:</span>
+            <div class="flex gap-2" id="portfolioTabs">
+                <!-- Portfolio tabs will be inserted here -->
+            </div>
+        </div>
+        
         <!-- Header Controls -->
         <div class="flex justify-between items-center mb-8">
             <button
@@ -493,6 +501,7 @@
         function switchPortfolio(portfolioId) {
             currentPortfolio = portfolioId;
             saveToStorage();
+            updatePortfolioTabs();
             updatePortfolioUI();
             closePortfolioManager();
             showNotification(`Switched to: ${portfolios[portfolioId].name}`);
@@ -514,6 +523,22 @@
                 updatePortfolioUI();
                 showNotification('Portfolio deleted');
             }
+        }
+
+        function updatePortfolioTabs() {
+            const tabs = document.getElementById('portfolioTabs');
+            tabs.innerHTML = Object.entries(portfolios).map(([id, portfolio]) => `
+                <button 
+                    onclick="switchPortfolio('${id}')"
+                    class="px-4 py-2 rounded-md whitespace-nowrap transition-all duration-200 ${
+                        id === currentPortfolio 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }"
+                >
+                    ${portfolio.name}
+                </button>
+            `).join('');
         }
 
         function updatePortfolioManagerUI() {
@@ -830,6 +855,7 @@
         function initialize() {
             loadFromStorage();
             initializeCharts();
+            updatePortfolioTabs();
             updatePortfolioUI();
             if (apiKey) {
                 fetchCryptoData();
