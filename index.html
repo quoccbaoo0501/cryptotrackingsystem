@@ -527,9 +527,9 @@
         function updatePortfolioTabs() {
             const tabs = document.getElementById('portfolioTabs');
             tabs.innerHTML = Object.entries(portfolios).map(([id, portfolio]) => `
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1" id="portfolio-${id}">
                     <button 
-                        onclick="switchPortfolio('${id}')"
+                        onclick="handlePortfolioClick('${id}')"
                         class="px-4 py-2 rounded-md whitespace-nowrap transition-all duration-200 ${
                             id === currentPortfolio 
                             ? 'bg-blue-600 text-white' 
@@ -538,16 +538,18 @@
                     >
                         ${portfolio.name}
                     </button>
-                    ${id !== 'default' ? `
-                        <button 
-                            onclick="deletePortfolio('${id}')"
-                            class="p-2 rounded-md bg-red-600 hover:bg-red-700 transition-colors duration-200"
-                        >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    ` : ''}
+                    <div class="hidden delete-button">
+                        ${id !== 'default' ? `
+                            <button 
+                                onclick="deletePortfolio('${id}')"
+                                class="p-2 rounded-md bg-red-600 hover:bg-red-700 transition-colors duration-200"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
             `).join('');
         }
@@ -898,6 +900,21 @@
             document.getElementById('userMenu').classList.add('hidden');
         }
 
+        function handlePortfolioClick(portfolioId) {
+            // First hide all delete buttons
+            document.querySelectorAll('.delete-button').forEach(btn => {
+                btn.classList.add('hidden');
+            });
+            
+            // Show delete button for clicked portfolio
+            const portfolioElement = document.getElementById(`portfolio-${portfolioId}`);
+            const deleteButton = portfolioElement.querySelector('.delete-button');
+            deleteButton.classList.remove('hidden');
+            
+            // Switch to the clicked portfolio
+            switchPortfolio(portfolioId);
+        }
+
         function toggleUserMenu() {
             const menu = document.getElementById('userMenu');
             menu.classList.toggle('hidden');
@@ -911,6 +928,13 @@
 
             if (!userButton && !userMenu.classList.contains('hidden')) {
                 userMenu.classList.add('hidden');
+            }
+            
+            // Hide delete buttons when clicking outside portfolios
+            if (!event.target.closest('.portfolio-card')) {
+                document.querySelectorAll('.delete-button').forEach(btn => {
+                    btn.classList.add('hidden');
+                });
             }
         });
     </script>
