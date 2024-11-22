@@ -234,7 +234,15 @@
         </div>
 
         <div class="mt-8 bg-gray-800 rounded-lg p-6">
-            <h2 class="text-xl font-bold mb-4" id="portfolioValueTitle">Portfolio Value Over Time</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold" id="portfolioValueTitle">Portfolio Value Over Time</h2>
+                <div class="flex gap-2">
+                    <button onclick="changeTimeframe('15m')" class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors">15m</button>
+                    <button onclick="changeTimeframe('1h')" class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors">1h</button>
+                    <button onclick="changeTimeframe('4h')" class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors">4h</button>
+                    <button onclick="changeTimeframe('1D')" class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors">1D</button>
+                </div>
+            </div>
             <div class="h-[300px]">
                 <canvas id="lineChart"></canvas>
             </div>
@@ -304,11 +312,17 @@
         let apiKey = localStorage.getItem('cmcApiKey') || '';
         let cryptoData = [];
         const COLORS = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+        let currentTimeframe = '15m';
         let portfolios = {
             'default': {
                 name: 'Default Portfolio',
                 assets: [],
-                chartData: []
+                chartData: {
+                    '15m': [],
+                    '1h': [],
+                    '4h': [],
+                    '1D': []
+                }
             }
         };
         let currentPortfolio = 'default';
@@ -488,7 +502,12 @@
                 portfolios[id] = {
                     name: name,
                     assets: [],
-                    chartData: []
+                    chartData: {
+                        '15m': [],
+                        '1h': [],
+                        '4h': [],
+                        '1D': []
+                    }
                 };
                 nameInput.value = '';
                 updatePortfolioManagerUI();
@@ -858,12 +877,35 @@
         }
 
         function updateCharts(totalValue) {
-            const now = new Date().toLocaleTimeString();
-            portfolios[currentPortfolio].chartData.push({ time: now, value: totalValue });
-            if (portfolios[currentPortfolio].chartData.length > 10) portfolios[currentPortfolio].chartData.shift();
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const dataPoint = { time: timeString, value: totalValue };
+            
+            // Add data point to each timeframe
+            portfolios[currentPortfolio].chartData['15m'].push(dataPoint);
+            portfolios[currentPortfolio].chartData['1h'].push(dataPoint);
+            portfolios[currentPortfolio].chartData['4h'].push(dataPoint);
+            portfolios[currentPortfolio].chartData['1D'].push(dataPoint);
 
-            lineChart.data.labels = portfolios[currentPortfolio].chartData.map(d => d.time);
-            lineChart.data.datasets[0].data = portfolios[currentPortfolio].chartData.map(d => d.value);
+            // Maintain appropriate number of points for each timeframe
+            const maxPoints = {
+                '15m': 15,
+                '1h': 60,
+                '4h': 240,
+                '1D': 1440
+            };
+
+            Object.keys(portfolios[currentPortfolio].chartData).forEach(timeframe => {
+                const data = portfolios[currentPortfolio].chartData[timeframe];
+                if (data.length > maxPoints[timeframe]) {
+                    data.shift();
+                }
+            });
+
+            // Update chart with current timeframe data
+            const currentData = portfolios[currentPortfolio].chartData[currentTimeframe];
+            lineChart.data.labels = currentData.map(d => d.time);
+            lineChart.data.datasets[0].data = currentData.map(d => d.value);
             lineChart.update();
 
             const pieData = portfolios[currentPortfolio].assets.filter(asset => asset.quantity > 0).map(asset => ({
@@ -918,6 +960,14 @@
             const portfolioElement = document.getElementById(`portfolio-${portfolioId}`);
             const deleteButton = portfolioElement.querySelector('.delete-button');
             deleteButton.classList.remove('hidden');
+        }
+
+        function changeTimeframe(timeframe) {
+            currentTimeframe = timeframe;
+            const currentData = portfolios[currentPortfolio].chartData[timeframe];
+            lineChart.data.labels = currentData.map(d => d.time);
+            lineChart.data.datasets[0].data = currentData.map(d => d.value);
+            lineChart.update();
         }
 
         function toggleUserMenu() {
