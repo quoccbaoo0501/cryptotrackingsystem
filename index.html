@@ -144,6 +144,14 @@
             </h1>
         </div>
         <div class="flex items-center space-x-4">
+            <div class="relative mr-4">
+                <button onclick="openPortfolioManager()" class="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    <span>Portfolios</span>
+                </button>
+            </div>
             <div class="relative">
                 <button onclick="toggleUserMenu()" class="flex items-center space-x-2 bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,6 +234,33 @@
         </div>
     </div>
 
+    <!-- Portfolio Manager Modal -->
+    <div id="portfolioModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Portfolio Manager</h2>
+                <button onclick="closePortfolioManager()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="mb-4">
+                <div class="flex items-center space-x-2 mb-4">
+                    <input type="text" id="newPortfolioName" placeholder="New Portfolio Name" 
+                           class="flex-grow bg-gray-700 text-white p-2 rounded-md">
+                    <button onclick="createNewPortfolio()" 
+                            class="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-700">
+                        Create
+                    </button>
+                </div>
+                <div id="portfolioList" class="space-y-2">
+                    <!-- Portfolio list will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Settings Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
@@ -262,8 +297,14 @@
         let apiKey = localStorage.getItem('cmcApiKey') || '';
         let cryptoData = [];
         const COLORS = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
-        let portfolio = [];
-        let chartData = [];
+        let portfolios = {
+            'default': {
+                name: 'Default Portfolio',
+                assets: [],
+                chartData: []
+            }
+        };
+        let currentPortfolio = 'default';
         let pieChart = null;
         let lineChart = null;
         let isDarkTheme = true;
@@ -407,15 +448,15 @@
 
         // Load data from localStorage
         function loadFromStorage() {
-            const savedPortfolio = localStorage.getItem('cryptoPortfolio');
-            const savedChartData = localStorage.getItem('cryptoChartData');
+            const savedPortfolios = localStorage.getItem('cryptoPortfolios');
+            const savedCurrentPortfolio = localStorage.getItem('currentPortfolio');
             
-            if (savedPortfolio) {
-                portfolio = JSON.parse(savedPortfolio);
+            if (savedPortfolios) {
+                portfolios = JSON.parse(savedPortfolios);
             }
             
-            if (savedChartData) {
-                chartData = JSON.parse(savedChartData);
+            if (savedCurrentPortfolio) {
+                currentPortfolio = savedCurrentPortfolio;
             }
 
             // Load API key status
@@ -427,8 +468,82 @@
 
         // Save data to localStorage
         function saveToStorage() {
-            localStorage.setItem('cryptoPortfolio', JSON.stringify(portfolio));
-            localStorage.setItem('cryptoChartData', JSON.stringify(chartData));
+            localStorage.setItem('cryptoPortfolios', JSON.stringify(portfolios));
+            localStorage.setItem('currentPortfolio', currentPortfolio);
+        }
+
+        function createNewPortfolio() {
+            const nameInput = document.getElementById('newPortfolioName');
+            const name = nameInput.value.trim();
+            
+            if (name) {
+                const id = 'portfolio_' + Date.now();
+                portfolios[id] = {
+                    name: name,
+                    assets: [],
+                    chartData: []
+                };
+                nameInput.value = '';
+                updatePortfolioManagerUI();
+                saveToStorage();
+                showNotification(`Created new portfolio: ${name}`);
+            }
+        }
+
+        function switchPortfolio(portfolioId) {
+            currentPortfolio = portfolioId;
+            saveToStorage();
+            updatePortfolioUI();
+            closePortfolioManager();
+            showNotification(`Switched to: ${portfolios[portfolioId].name}`);
+        }
+
+        function deletePortfolio(portfolioId) {
+            if (portfolioId === 'default') {
+                showNotification('Cannot delete default portfolio', 'error');
+                return;
+            }
+            
+            if (confirm(`Delete portfolio "${portfolios[portfolioId].name}"?`)) {
+                delete portfolios[portfolioId];
+                if (currentPortfolio === portfolioId) {
+                    currentPortfolio = 'default';
+                }
+                saveToStorage();
+                updatePortfolioManagerUI();
+                updatePortfolioUI();
+                showNotification('Portfolio deleted');
+            }
+        }
+
+        function updatePortfolioManagerUI() {
+            const list = document.getElementById('portfolioList');
+            list.innerHTML = Object.entries(portfolios).map(([id, portfolio]) => `
+                <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg ${id === currentPortfolio ? 'border-2 border-blue-500' : ''}">
+                    <span class="font-medium">${portfolio.name}</span>
+                    <div class="flex space-x-2">
+                        <button onclick="switchPortfolio('${id}')"
+                                class="bg-blue-600 px-3 py-1 rounded hover:bg-blue-700">
+                            Select
+                        </button>
+                        ${id !== 'default' ? `
+                            <button onclick="deletePortfolio('${id}')"
+                                    class="bg-red-600 px-3 py-1 rounded hover:bg-red-700">
+                                Delete
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openPortfolioManager() {
+            document.getElementById('portfolioModal').classList.remove('hidden');
+            updatePortfolioManagerUI();
+        }
+
+        function closePortfolioManager() {
+            document.getElementById('portfolioModal').classList.add('hidden');
         }
 
         // Initialize charts
@@ -596,9 +711,9 @@
         }
 
         function addToPortfolio(cryptoId) {
-            if (!portfolio.some(asset => asset.id === cryptoId)) {
+            if (!portfolios[currentPortfolio].assets.some(asset => asset.id === cryptoId)) {
                 const crypto = cryptoData.find(c => c.id === cryptoId);
-                portfolio.push({ ...crypto, quantity: 0, userPrice: crypto.price });
+                portfolios[currentPortfolio].assets.push({ ...crypto, quantity: 0, userPrice: crypto.price });
                 updatePortfolioUI();
                 saveToStorage();
             }
@@ -607,7 +722,7 @@
         }
 
         function updateQuantity(id, quantity) {
-            portfolio = portfolio.map(asset =>
+            portfolios[currentPortfolio].assets = portfolios[currentPortfolio].assets.map(asset =>
                 asset.id === id ? { ...asset, quantity: parseFloat(quantity) } : asset
             );
             updatePortfolioUI();
@@ -623,13 +738,14 @@
         }
 
         function removeFromPortfolio(id) {
-            portfolio = portfolio.filter(asset => asset.id !== id);
+            portfolios[currentPortfolio].assets = portfolios[currentPortfolio].assets.filter(asset => asset.id !== id);
             updatePortfolioUI();
             saveToStorage();
         }
 
         function updatePortfolioUI() {
-            portfolioList.innerHTML = portfolio.map(asset => `
+            const currentAssets = portfolios[currentPortfolio].assets;
+            portfolioList.innerHTML = currentAssets.map(asset => `
                 <div class="flex flex-col mb-6 p-4 bg-gray-700 rounded-lg slide-in">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-lg font-semibold">${asset.name} (${asset.symbol})</span>
@@ -670,7 +786,7 @@
                 </div>
             `).join('');
 
-            const totalValue = portfolio.reduce((total, asset) => {
+            const totalValue = portfolios[currentPortfolio].assets.reduce((total, asset) => {
                 return total + (asset.userPrice * asset.quantity);
             }, 0);
             
@@ -681,14 +797,14 @@
 
         function updateCharts(totalValue) {
             const now = new Date().toLocaleTimeString();
-            chartData.push({ time: now, value: totalValue });
-            if (chartData.length > 10) chartData.shift();
+            portfolios[currentPortfolio].chartData.push({ time: now, value: totalValue });
+            if (portfolios[currentPortfolio].chartData.length > 10) portfolios[currentPortfolio].chartData.shift();
 
-            lineChart.data.labels = chartData.map(d => d.time);
-            lineChart.data.datasets[0].data = chartData.map(d => d.value);
+            lineChart.data.labels = portfolios[currentPortfolio].chartData.map(d => d.time);
+            lineChart.data.datasets[0].data = portfolios[currentPortfolio].chartData.map(d => d.value);
             lineChart.update();
 
-            const pieData = portfolio.filter(asset => asset.quantity > 0).map(asset => ({
+            const pieData = portfolios[currentPortfolio].assets.filter(asset => asset.quantity > 0).map(asset => ({
                 name: asset.symbol,
                 value: asset.quantity * asset.userPrice
             }));
