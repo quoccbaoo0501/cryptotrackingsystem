@@ -530,6 +530,7 @@
                 <div class="flex items-center gap-1" id="portfolio-${id}">
                     <button 
                         onclick="handlePortfolioClick('${id}')"
+                        oncontextmenu="handlePortfolioContextMenu(event, '${id}')"
                         class="px-4 py-2 rounded-md whitespace-nowrap transition-all duration-200 ${
                             id === currentPortfolio 
                             ? 'bg-blue-600 text-white' 
@@ -901,18 +902,22 @@
         }
 
         function handlePortfolioClick(portfolioId) {
+            // Switch to the clicked portfolio
+            switchPortfolio(portfolioId);
+        }
+
+        function handlePortfolioContextMenu(event, portfolioId) {
+            event.preventDefault(); // Prevent default context menu
+            
             // First hide all delete buttons
             document.querySelectorAll('.delete-button').forEach(btn => {
                 btn.classList.add('hidden');
             });
             
-            // Show delete button for clicked portfolio
+            // Show delete button for right-clicked portfolio
             const portfolioElement = document.getElementById(`portfolio-${portfolioId}`);
             const deleteButton = portfolioElement.querySelector('.delete-button');
             deleteButton.classList.remove('hidden');
-            
-            // Switch to the clicked portfolio
-            switchPortfolio(portfolioId);
         }
 
         function toggleUserMenu() {
