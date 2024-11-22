@@ -144,14 +144,6 @@
             </h1>
         </div>
         <div class="flex items-center space-x-4">
-            <div class="relative mr-4">
-                <button onclick="openPortfolioManager()" class="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                    </svg>
-                    <span>Portfolios</span>
-                </button>
-            </div>
             <div class="relative">
                 <button onclick="toggleUserMenu()" class="flex items-center space-x-2 bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,10 +165,17 @@
     <div class="max-w-4xl mx-auto">
         <!-- Portfolio Selection Bar -->
         <div class="flex items-center gap-4 mb-8 overflow-x-auto p-2 bg-gray-800 rounded-lg">
-            <span class="text-gray-400 whitespace-nowrap">Select Portfolio:</span>
-            <div class="flex gap-2" id="portfolioTabs">
+            <div class="flex gap-2 flex-grow" id="portfolioTabs">
                 <!-- Portfolio tabs will be inserted here -->
             </div>
+            <button 
+                onclick="addNewPortfolio()"
+                class="flex-shrink-0 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md transition-colors duration-200"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+            </button>
         </div>
         
         <!-- Header Controls -->
@@ -528,17 +527,52 @@
         function updatePortfolioTabs() {
             const tabs = document.getElementById('portfolioTabs');
             tabs.innerHTML = Object.entries(portfolios).map(([id, portfolio]) => `
-                <button 
-                    onclick="switchPortfolio('${id}')"
-                    class="px-4 py-2 rounded-md whitespace-nowrap transition-all duration-200 ${
-                        id === currentPortfolio 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    }"
-                >
-                    ${portfolio.name}
-                </button>
+                <div class="flex items-center gap-1">
+                    <button 
+                        onclick="switchPortfolio('${id}')"
+                        class="px-4 py-2 rounded-md whitespace-nowrap transition-all duration-200 ${
+                            id === currentPortfolio 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }"
+                    >
+                        ${portfolio.name}
+                    </button>
+                    ${id !== 'default' ? `
+                        <button 
+                            onclick="deletePortfolio('${id}')"
+                            class="p-2 rounded-md bg-red-600 hover:bg-red-700 transition-colors duration-200"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    ` : ''}
+                </div>
             `).join('');
+        }
+
+        async function addNewPortfolio() {
+            const name = await promptAsync('Enter portfolio name:');
+            if (name) {
+                const id = 'portfolio_' + Date.now();
+                portfolios[id] = {
+                    name: name,
+                    assets: [],
+                    chartData: []
+                };
+                updatePortfolioTabs();
+                saveToStorage();
+                switchPortfolio(id);
+                showNotification(`Created new portfolio: ${name}`);
+            }
+        }
+
+        function promptAsync(message) {
+            return new Promise(resolve => {
+                const name = prompt(message);
+                resolve(name ? name.trim() : null);
+            });
         }
 
         function updatePortfolioManagerUI() {
